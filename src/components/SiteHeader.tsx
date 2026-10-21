@@ -1,10 +1,9 @@
 import { Moon, Sun } from 'lucide-react';
+import { ABOUT_YOUDO_HASH } from '../data/links';
 import type { Theme } from '../hooks/useTheme';
-import { YOUDO_TOOLS_HASH, type View } from '../hooks/useHashView';
-import { CalcuWordmark, YouDoToolBadge } from './brand/Brand';
+import { ByYouDoBadge, CalcuWordmark } from './brand/Brand';
 
 interface SiteHeaderProps {
-  view: View;
   theme: Theme;
   onToggleTheme: () => void;
   isCalculatorOpen: boolean;
@@ -16,21 +15,16 @@ const NAV_LINKS = [
   { href: '#download', label: 'Download' },
   { href: '#safety', label: 'Safety' },
   { href: '#source', label: 'Source files' },
+  { href: ABOUT_YOUDO_HASH, label: 'About YouDO' },
 ];
 
 export function SiteHeader({
-  view,
   theme,
   onToggleTheme,
   isCalculatorOpen,
   onToggleCalculator,
   hotkey,
 }: SiteHeaderProps) {
-  const navClass = (active: boolean) =>
-    `whitespace-nowrap transition-colors ${
-      active ? 'text-content-primary font-semibold' : 'hover:text-content-primary'
-    }`;
-
   return (
     <header
       className="sticky top-0 z-40 border-b border-subtle backdrop-blur-xl"
@@ -42,19 +36,20 @@ export function SiteHeader({
             <CalcuWordmark />
           </a>
           <span className="hidden sm:inline-flex">
-            <YouDoToolBadge />
+            <ByYouDoBadge />
           </span>
         </div>
 
         <nav className="hidden items-center gap-6 text-sm text-content-secondary md:flex">
           {NAV_LINKS.map((link) => (
-            <a key={link.href} href={link.href} className={navClass(false)}>
+            <a
+              key={link.href}
+              href={link.href}
+              className="whitespace-nowrap transition-colors hover:text-content-primary"
+            >
               {link.label}
             </a>
           ))}
-          <a href={YOUDO_TOOLS_HASH} className={navClass(view === 'youdo-tools')}>
-            YouDO Tools
-          </a>
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">

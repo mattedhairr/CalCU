@@ -1,8 +1,8 @@
 @echo off
 setlocal
-title CalCU - a YouDO Tool - Uninstaller
+title CalCU by YouDO - Uninstaller
 echo ============================================================================
-echo   CalCU - a YouDO Tool - Uninstaller
+echo   CalCU by YouDO - Uninstaller
 echo ============================================================================
 echo.
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, Copy, Download, FileCode } from 'lucide-react';
-import { LINKS } from '../data/projects';
+import { LINKS } from '../data/links';
 import { downloadTextFile } from '../utils/download';
 
 export interface SourceFile {

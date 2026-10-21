@@ -1,12 +1,12 @@
 @echo off
 setlocal
-title CalCU - a YouDO Tool - Installer
+title CalCU by YouDO - Installer
 
 :: The CalCU website rewrites this line for custom downloads.
 set "HOTKEY=Alt+C"
 
 echo ============================================================================
-echo   CalCU - a YouDO Tool
+echo   CalCU by YouDO
 echo   GATE virtual calculator overlay. Shortcut: %HOTKEY%
 echo ============================================================================
 echo.

@@ -7,14 +7,14 @@
 
 <br />
 
-**CalCU is a YouDO Tool** by [**Jatin Parmar (@mattedhairr)**](https://github.com/mattedhairr) — made for YouDO focus sessions, so GATE, ESE, and PSU aspirants can solve numericals over PDFs and lectures without breaking their session.
+**CalCU by [YouDO](https://youdo-app.vercel.app)** — so GATE, ESE, and PSU aspirants can solve numericals over PDFs and lectures on their laptop without switching windows or devices.
 
 [**Explore YouDO**](https://youdo-app.vercel.app) &nbsp; | &nbsp; [**YouDO Android APK**](https://github.com/mattedhairr/YouDO/releases) &nbsp; | &nbsp; [**Updates**](https://t.me/YouDO_Updates) &nbsp; | &nbsp; [**Join the discussion**](https://t.me/+-manVNAPhThkMzRl)
 
 <br />
 
 [![Platform](https://img.shields.io/badge/platform-Windows_10_%2F_11-8FB394?style=flat-square&logo=windows&logoColor=white)](./windows-overlay)
-[![YouDO Tools](https://img.shields.io/badge/YouDO_Tools-CalCU-C9A46E?style=flat-square)](https://github.com/mattedhairr/YouDO)
+[![by YouDO](https://img.shields.io/badge/by-YouDO-C9A46E?style=flat-square)](https://github.com/mattedhairr/YouDO)
 [![License](https://img.shields.io/badge/license-MIT-C9A46E?style=flat-square)](./LICENSE)
 [![Telegram](https://img.shields.io/badge/Telegram-community-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/+-manVNAPhThkMzRl)
 
@@ -58,24 +58,16 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 1. **100% Original Clean-Room Code:** Every line of React, TypeScript, C#, and Batch code in this repository is written from scratch under the **MIT License**.
 2. **Functional Mechanics Are Not Copyrightable:** Mathematical formulas, post-fix button order, and scientific calculator layouts are utilitarian mechanics and are not subject to copyright protection.
 3. **Zero Proprietary Assets Redistributed:** This repository does not host or redistribute any proprietary third-party code, images, or logos. When the Windows overlay opens the official calculator URL inside a `WebBrowser` frame, it acts strictly as a lightweight user browser bookmark.
-4. **Non-Affiliation Disclaimer:** *GATE* and *TCS iON* are trademarks/names of their respective owners. **CalCU** is an independent, student-built open-source study utility under **YouDO Tools** and is not affiliated with or endorsed by them.
+4. **Non-Affiliation Disclaimer:** *GATE* and *TCS iON* are trademarks/names of their respective owners. **CalCU** is an independent, student-built open-source study utility by **YouDO** and is not affiliated with or endorsed by them.
 
 ---
 
-## YouDO Tools
+## About YouDO
 
-| Tool | Description |
-|---|---|
-| [**YouDO**](https://github.com/mattedhairr/YouDO) | The focus and goal-planning companion for serious aspirants ([Web App](https://youdo-app.vercel.app) · [Android APK](https://github.com/mattedhairr/YouDO/releases)) |
-| **CalCU** | Global-shortcut (`Alt + C`) GATE virtual calculator overlay for Windows 10 / 11 |
+CalCU is made by [**YouDO**](https://github.com/mattedhairr/YouDO): the focus and goal-planning app for serious aspirants preparing for UPSC, JEE, NEET, GATE and CAT. It connects every layer of your syllabus to the work you should finish today, runs pause-aware focus sessions, and tracks honest progress.
 
-### More from the developer
-
-Not part of YouDO Tools: VLSI physical design work by Jatin Parmar.
-
-- [**8-bit RISC-V Inspired CPU**](https://github.com/mattedhairr/8-bit-CPU-RTL-to-GDSII) — multi-cycle CPU from Verilog RTL to GDSII (Yosys, OpenROAD)
-- [**4-bit ALU**](https://github.com/mattedhairr/4-bit-ALU-RTL-to-GDSII) — complete RTL-to-GDSII flow targeting SkyWater 130nm
+[**Open YouDO**](https://youdo-app.vercel.app) &nbsp; · &nbsp; [**Android APK**](https://github.com/mattedhairr/YouDO/releases) &nbsp; · &nbsp; [**Telegram updates**](https://t.me/YouDO_Updates)
 
 ## License
 
-Released under the [MIT License](./LICENSE).
+Released under the [MIT License](./LICENSE). More by [Jatin Parmar (@mattedhairr)](https://github.com/mattedhairr).

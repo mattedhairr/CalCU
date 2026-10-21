@@ -1,5 +1,5 @@
 // ============================================================================
-// CalCU - a YouDO Tool
+// CalCU by YouDO
 // Show / hide the GATE virtual scientific calculator anywhere on Windows.
 //
 // Repository: https://github.com/mattedhairr/CalCU
@@ -90,7 +90,7 @@ namespace CalCU
 
             Label titleLabel = new Label
             {
-                Text = "  CalCU - a YouDO Tool   [" + HOTKEY_LABEL + " to toggle]",
+                Text = "  CalCU by YouDO   [" + HOTKEY_LABEL + " to toggle]",
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                 AutoSize = false,

@@ -1,4 +1,4 @@
-import { YOUDO_TOOLS_HASH } from '../../hooks/useHashView';
+import { ABOUT_YOUDO_HASH } from '../../data/links';
 
 /** The YouDO "Y" mark, same paths and colours as in the YouDO app header. */
 export function YouDoMark({ size = 18 }: { size?: number }) {
@@ -39,18 +39,16 @@ export function CalcuWordmark({ className = 'text-[22px]' }: { className?: strin
   );
 }
 
-/** The "a YouDO Tool" pill that sits next to the CalCU wordmark. */
-export function YouDoToolBadge() {
+/** The "by YouDO" pill next to the CalCU wordmark; YouDO is CalCU's maker. */
+export function ByYouDoBadge() {
   return (
     <a
-      href={YOUDO_TOOLS_HASH}
+      href={ABOUT_YOUDO_HASH}
       className="inline-flex items-center gap-1.5 rounded-full bg-fill px-2.5 py-1 text-xs font-medium text-content-secondary transition-colors hover:text-content-primary"
     >
-      <span>a</span>
+      <span>by</span>
       <YouDoMark size={13} />
-      <span>
-        <span className="font-semibold text-content-primary">YouDO</span> Tool
-      </span>
+      <span className="font-semibold text-content-primary">YouDO</span>
     </a>
   );
 }
