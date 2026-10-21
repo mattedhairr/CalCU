@@ -47,7 +47,7 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 
 **Yes — 100% transparent, plain-text, and compiled locally by Windows.**
 
-1. **No Mystery Pre-Compiled Binaries:** Instead of asking you to trust an opaque `.exe` downloaded from the web, `Install-CalCU.bat` and `CalCU.cs` are **plain-text files**. You can right-click → **Edit in Notepad** and read all ~230 lines of code before running.
+1. **No Mystery Pre-Compiled Binaries:** Instead of asking you to trust an opaque `.exe` downloaded from the web, `Install-CalCU.bat` and `CalCU.cs` are **plain-text files**. You can right-click → **Edit in Notepad** and read every line of code before running.
 2. **Compiled Locally by Microsoft Windows:** The script uses the official Microsoft C# compiler (`C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe`) pre-installed on every Windows 10 and Windows 11 PC.
 3. **Zero Admin Rights Required:** Runs in standard user mode, uses ~15 MB RAM, installs no background services or drivers, and only registers your `Alt + C` shortcut via the standard Win32 `RegisterHotKey` API (`user32.dll`).
 
