@@ -33,6 +33,36 @@ namespace CalCU
         private const string CALCULATOR_URL = "https://tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html";
         // ---------------------------------------------------------------------
 
+        // The window is exactly the size of the calculator on the page, so it
+        // looks like the exam calculator and nothing else (no extra title bar).
+        private const int CALC_WIDTH = 463;
+        private const int CALC_HEIGHT = 330;
+
+        // Runs in the calculator page once it has loaded. It removes the page
+        // margin and hands the calculator's own controls to this window:
+        // dragging the blue bar moves the window, _ and X hide it, and so does
+        // Esc. The page's own _ would fold the keys away, and its X does nothing.
+        private const string PAGE_SCRIPT = @"
+(function () {
+    var $ = window.jQuery;
+    if (!$ || window.calcuReady) return;
+    window.calcuReady = true;
+    $('.calc_min').die('click');
+    $('.calc_max').die('click');
+    $('#calc_min, #closeButton').unbind('click').click(function () {
+        window.external.HideCalculator();
+        return false;
+    });
+    $('#helptopDiv').css('cursor', 'move').mousedown(function (e) {
+        if (e.which !== 1 || $(e.target).closest('.help_back').length) return;
+        window.external.StartDrag();
+        return false;
+    });
+    $(document).keydown(function (e) {
+        if (e.keyCode === 27) window.external.EscapePressed();
+    });
+})();";
+
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
@@ -52,7 +82,6 @@ namespace CalCU
 
         private WebBrowser browser;
         private NotifyIcon trayIcon;
-        private Panel titleBar;
 
         public OverlayForm()
         {
@@ -60,11 +89,11 @@ namespace CalCU
 
             this.Text = "CalCU - GATE Calculator (" + HOTKEY_LABEL + ")";
             this.FormBorderStyle = FormBorderStyle.None;
-            this.Size = new Size(482, 368);
+            this.ClientSize = new Size(CALC_WIDTH, CALC_HEIGHT);
             this.TopMost = ALWAYS_ON_TOP;
             this.Opacity = WINDOW_OPACITY;
             this.ShowInTaskbar = false;
-            this.BackColor = Color.FromArgb(51, 122, 183);
+            this.BackColor = Color.FromArgb(218, 218, 218); // the calculator's grey, shown while loading
 
             Rectangle workArea = Screen.PrimaryScreen.WorkingArea;
             if (START_POSITION == "Center")
@@ -80,55 +109,17 @@ namespace CalCU
                 this.Location = new Point(workArea.Right - this.Width - 24, top);
             }
 
-            titleBar = new Panel
-            {
-                Dock = DockStyle.Top,
-                Height = 28,
-                BackColor = Color.FromArgb(40, 96, 144),
-                Cursor = Cursors.SizeAll
-            };
-
-            Label titleLabel = new Label
-            {
-                Text = "  CalCU by YouDO   [" + HOTKEY_LABEL + " to toggle]",
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                AutoSize = false,
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
-            };
-
-            Button hideBtn = new Button
-            {
-                Text = "Hide (" + HOTKEY_LABEL + ")",
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(51, 122, 183),
-                FlatStyle = FlatStyle.Flat,
-                Dock = DockStyle.Right,
-                Width = 105,
-                Font = new Font("Segoe UI", 8F, FontStyle.Regular),
-                Cursor = Cursors.Hand
-            };
-            hideBtn.FlatAppearance.BorderSize = 0;
-            hideBtn.Click += (s, e) => ToggleOverlay();
-
-            titleLabel.MouseDown += DragWindow;
-            titleBar.MouseDown += DragWindow;
-
-            titleBar.Controls.Add(titleLabel);
-            titleBar.Controls.Add(hideBtn);
-
             browser = new WebBrowser
             {
                 Dock = DockStyle.Fill,
                 ScrollBarsEnabled = false,
                 ScriptErrorsSuppressed = true,
-                IsWebBrowserContextMenuEnabled = false
+                IsWebBrowserContextMenuEnabled = false,
+                ObjectForScripting = new CalculatorBridge(this)
             };
+            browser.DocumentCompleted += (s, e) => PrepareCalculatorPage();
             browser.Navigate(CALCULATOR_URL);
-
             this.Controls.Add(browser);
-            this.Controls.Add(titleBar);
 
             ContextMenu trayMenu = new ContextMenu();
             trayMenu.MenuItems.Add("Toggle CalCU (" + HOTKEY_LABEL + ")", (s, e) => ToggleOverlay());
@@ -147,21 +138,35 @@ namespace CalCU
                 Visible = true
             };
             trayIcon.DoubleClick += (s, e) => ToggleOverlay();
-
-            if (HIDE_ON_ESCAPE)
-            {
-                this.KeyPreview = true;
-                this.KeyDown += (s, e) => { if (e.KeyCode == Keys.Escape) this.Hide(); };
-            }
         }
 
-        private void DragWindow(object sender, MouseEventArgs e)
+        private void PrepareCalculatorPage()
         {
-            if (e.Button == MouseButtons.Left)
+            HtmlDocument doc = browser.Document;
+            if (doc == null || doc.Body == null) return;
+            doc.Body.Style = "margin:0;overflow:hidden";
+            try
             {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+                doc.InvokeScript("eval", new object[] { PAGE_SCRIPT });
             }
+            catch { }
+        }
+
+        // Called from the page (see PAGE_SCRIPT) through CalculatorBridge.
+        public void StartDrag()
+        {
+            ReleaseCapture();
+            SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+        }
+
+        public void HideOverlay()
+        {
+            this.Hide();
+        }
+
+        public void EscapePressed()
+        {
+            if (HIDE_ON_ESCAPE) this.Hide();
         }
 
         protected override void OnHandleCreated(EventArgs e)
@@ -229,5 +234,21 @@ namespace CalCU
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new OverlayForm());
         }
+    }
+
+    // What the calculator page can call as window.external.* (see PAGE_SCRIPT).
+    [ComVisible(true)]
+    public class CalculatorBridge
+    {
+        private readonly OverlayForm form;
+
+        public CalculatorBridge(OverlayForm form)
+        {
+            this.form = form;
+        }
+
+        public void StartDrag() { form.StartDrag(); }
+        public void HideCalculator() { form.HideOverlay(); }
+        public void EscapePressed() { form.EscapePressed(); }
     }
 }
