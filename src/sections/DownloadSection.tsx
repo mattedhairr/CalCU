@@ -23,7 +23,7 @@ interface DownloadSectionProps {
 const STEPS = (hotkey: string) => [
   {
     title: 'Run Install-CalCU.bat',
-    body: "It builds a small CalCU.exe (about 11 KB) on your PC with the C# compiler that's already part of Windows.",
+    body: "It builds a small CalCU.exe (about 11 KB) on your PC with the C# compiler that's already part of Windows, and sets it to start with Windows.",
   },
   {
     title: `Press ${hotkey} anywhere`,
@@ -31,7 +31,7 @@ const STEPS = (hotkey: string) => [
   },
   {
     title: 'Uninstall in one click',
-    body: 'Uninstall-CalCU.bat stops CalCU and removes the app and its one registry value.',
+    body: 'Uninstall-CalCU.bat stops CalCU and removes the app, its startup entry and its registry value.',
   },
 ];
 

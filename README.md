@@ -39,7 +39,7 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 
 | 1. Install (`2 sec`) | 2. Solve (`Alt + C`) | 3. Uninstall (`1 click`) |
 |---|---|---|
-| Keep **`CalCU.cs`** next to it and double-click **`Install-CalCU.bat`** (or download the single-file installer from the website). It uses Windows' built-in `.NET` compiler (`csc.exe`) to build a tiny `~11 KB` **`CalCU.exe`** that runs from your system tray. | Press **`Alt + C`** over any PDF, test series, or video lecture to pop up or hide the GATE calculator. | Double-click **`Uninstall-CalCU.bat`** anytime to stop the process, delete `CalCU.exe`, and clean up the user registry key. |
+| Keep **`CalCU.cs`** next to it and double-click **`Install-CalCU.bat`** (or download the single-file installer from the website). It uses Windows' built-in `.NET` compiler (`csc.exe`) to build a tiny `~11 KB` **`CalCU.exe`** that runs from your system tray and starts with Windows (turn that off in Task Manager → Startup apps). | Press **`Alt + C`** over any PDF, test series, or video lecture to pop up or hide the GATE calculator. | Double-click **`Uninstall-CalCU.bat`** anytime to stop the process, delete `CalCU.exe`, and remove its startup entry and registry value. |
 
 ---
 

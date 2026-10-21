@@ -43,7 +43,7 @@ if errorlevel 1 (
     copy /y "%~dp0CalCU.cs" "%SRC%" >nul
 )
 
-echo [1/2] Building CalCU.exe with the C# compiler built into Windows...
+echo [1/3] Building CalCU.exe with the C# compiler built into Windows...
 "%CSC%" /nologo /target:winexe /out:"%~dp0CalCU.exe" "%SRC%"
 set "BUILD_RESULT=%ERRORLEVEL%"
 del "%SRC%" >nul 2>&1
@@ -54,11 +54,17 @@ if not "%BUILD_RESULT%"=="0" (
     exit /b 1
 )
 
-echo [2/2] Starting CalCU.exe...
+:: Per-user startup entry (no admin rights needed). It points at this folder,
+:: so moving the folder means running the installer again.
+echo [2/3] Setting CalCU to start with Windows...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" /t REG_SZ /d "\"%~dp0CalCU.exe\"" /f >nul
+
+echo [3/3] Starting CalCU.exe...
 start "" "%~dp0CalCU.exe"
 echo.
 echo   HOW TO USE
 echo   - Press %HOTKEY% anywhere on Windows to show / hide the calculator.
+echo   - CalCU now starts with Windows. Turn that off in Task Manager - Startup apps.
 echo   - Right-click the CalCU tray icon near the clock to exit.
 echo   - Run Uninstall-CalCU.bat to remove it.
 echo.
