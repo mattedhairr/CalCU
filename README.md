@@ -64,9 +64,17 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 
 ## About YouDO
 
-CalCU is made by [**YouDO**](https://github.com/mattedhairr/YouDO): the focus and goal-planning app for serious aspirants preparing for UPSC, JEE, NEET, GATE and CAT. It connects every layer of your syllabus to the work you should finish today, runs pause-aware focus sessions, and tracks honest progress.
+CalCU is made by [**YouDO**](https://github.com/mattedhairr/YouDO). *Your exam plan is a tree. Not a to-do list.*
 
-[**Open YouDO**](https://youdo-app.vercel.app) &nbsp; · &nbsp; [**Android APK**](https://github.com/mattedhairr/YouDO/releases) &nbsp; · &nbsp; [**Telegram updates**](https://t.me/YouDO_Updates)
+YouDO connects every part of your syllabus to the work you should finish now, then tracks what moved, what remains, and how much focused work you actually did. For UPSC, JEE, NEET, GATE, CAT and every serious preparation journey.
+
+| 1. Build | 2. Schedule | 3. Focus | 4. Review |
+|---|---|---|---|
+| Map the whole syllabus as one tree, in your own names and as deep as it needs to go. | Send a whole task, or only the steps you will finish, to the day they belong. | Pause-aware sessions count real focus, not clock time, with an ambient clock and focus sounds. | Unfinished work stays in Backlog, and each day ends with net focus, streaks and goal progress. |
+
+Free, open source and ad-free, with or without an account.
+
+[**Get the Android app**](https://github.com/mattedhairr/YouDO/releases) &nbsp; · &nbsp; [**Open in browser**](https://youdo-app.vercel.app) &nbsp; · &nbsp; [**Telegram updates**](https://t.me/YouDO_Updates)
 
 ## License
 
