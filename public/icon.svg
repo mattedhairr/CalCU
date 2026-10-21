@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Same tile and sand / sage pair as the YouDO app icon -->
+  <rect width="512" height="512" rx="115.2" fill="#14120F"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="34">
+    <rect x="136" y="96" width="240" height="320" rx="44" stroke="#C9A46E"/>
+    <path d="M186 168H326" stroke="#C9A46E"/>
+    <path d="M196 262H316M196 330H316" stroke="#8FB394"/>
+  </g>
+</svg>

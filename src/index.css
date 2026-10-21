@@ -1,26 +1,185 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────
+   YouDO design tokens, so CalCU reads as part of the YouDO family.
+   Copied from mattedhairr/YouDO src/index.css (default "sand" accent) and
+   kept under the same names; when YouDO's palette changes, update these.
+   ───────────────────────────────────────────────────────────────────────── */
+html.dark {
+  --bg-base: #000000;
+  --bg-surface: #1c1c1e;
+  --bg-elevated: #2c2c2e;
+  --bg-fill: rgba(118, 118, 128, 0.24);
+  --bg-fill-strong: rgba(118, 118, 128, 0.32);
+  --primary: #c9a46e;
+  --accent-tick: #8fb394;
+  --success: #30d158;
+  --warning: #ff9f0a;
+  --error: #ff453a;
+  --on-primary: #14120f;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1a6;
+  --text-muted: #6e6e73;
+  --border: #38383a;
+  --border-subtle: #232326;
+  --shadow-card: 0 0 0 transparent;
+  --shadow-elevated: 0 24px 60px -24px rgba(0, 0, 0, 0.85);
+  --header-bg: rgba(0, 0, 0, 0.72);
+  color-scheme: dark;
+}
+
+html.light {
+  --bg-base: #f2f2f7;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-fill: rgba(118, 118, 128, 0.12);
+  --bg-fill-strong: rgba(118, 118, 128, 0.2);
+  --primary: #8c6a3a;
+  --accent-tick: #4e7a57;
+  --success: #248a3d;
+  --warning: #c93400;
+  --error: #e5342a;
+  --on-primary: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #6c6c70;
+  --text-muted: #8e8e93;
+  --border: #d1d1d6;
+  --border-subtle: #ebebef;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 14px -6px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 24px 60px -24px rgba(0, 0, 0, 0.28);
+  --header-bg: rgba(242, 242, 247, 0.8);
+  color-scheme: light;
+}
+
+html {
+  --primary-soft: color-mix(in srgb, var(--primary) 16%, var(--bg-surface));
+  --primary-glow: color-mix(in srgb, var(--primary) 82%, #ffffff);
+  --ring: color-mix(in srgb, var(--primary) 34%, transparent);
+  --radius: 18px;
+}
+
+@theme inline {
+  --color-base: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-fill: var(--bg-fill);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: var(--on-primary);
+  --color-tick: var(--accent-tick);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-subtle: var(--border-subtle);
+  --color-content-primary: var(--text-primary);
+  --color-content-secondary: var(--text-secondary);
+  --color-content-muted: var(--text-muted);
+}
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Variable', 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, 'Roboto Mono', monospace;
+  /* Apple-style continuous corners, as in YouDO */
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 @layer base {
-  :root {
-    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  *, ::before, ::after {
+    border-color: var(--border);
   }
 
   body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     font-family: var(--font-sans);
-    background-color: #F8FAFC;
-    color: #0F172A;
+    -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, .font-display {
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 28%, transparent);
+  }
+
+  h1, h2, h3, h4 {
     font-family: var(--font-display);
+    letter-spacing: -0.02em;
   }
 
-  code, pre, .font-mono {
+  code, pre {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
+}
+
+@layer components {
+  .card {
+    background-color: var(--bg-surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+  }
+
+  .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease-spring), transform 0.15s var(--ease-spring);
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--ring); }
+
+  .btn-primary {
+    background: var(--primary);
+    color: var(--on-primary);
+    box-shadow: 0 8px 22px -12px color-mix(in srgb, var(--primary) 80%, transparent);
+  }
+  .btn-secondary {
+    background: var(--bg-fill);
+    color: var(--text-primary);
+  }
+  @media (hover: hover) {
+    .btn-primary:hover { background: color-mix(in srgb, var(--primary) 88%, #ffffff); }
+    .btn-secondary:hover { background: var(--bg-fill-strong); }
+  }
+
+  .kbd {
+    display: inline-block;
+    padding: 0.05rem 0.45rem;
+    border-radius: 6px;
+    background: var(--bg-fill);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  /* The calculator mark and wordmarks: "Cal" lighter, "CU" bold, echoing
+     YouDO's "ou" / "DO" wordmark. */
+  .wordmark {
+    font-family: var(--font-display);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text-primary);
+  }
+  .wordmark-light { font-weight: 500; color: var(--text-secondary); }
+  .wordmark-bold { font-weight: 700; }
 }
 
 /* Authentic TCS iON Scientific Calculator Tactile Key Shadows */

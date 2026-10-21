@@ -7,15 +7,15 @@
 
 <br />
 
-Part of **YouDO Tools** by [**Jatin Parmar (@mattedhairr)**](https://github.com/mattedhairr) — built so GATE, ESE, and PSU aspirants can solve numericals over PDFs and lectures without breaking their focus session.
+**CalCU is a YouDO Tool** by [**Jatin Parmar (@mattedhairr)**](https://github.com/mattedhairr) — made for YouDO focus sessions, so GATE, ESE, and PSU aspirants can solve numericals over PDFs and lectures without breaking their session.
 
 [**Explore YouDO**](https://youdo-app.vercel.app) &nbsp; | &nbsp; [**YouDO Android APK**](https://github.com/mattedhairr/YouDO/releases) &nbsp; | &nbsp; [**Updates**](https://t.me/YouDO_Updates) &nbsp; | &nbsp; [**Join the discussion**](https://t.me/+-manVNAPhThkMzRl)
 
 <br />
 
-[![Platform](https://img.shields.io/badge/platform-Windows_10_%2F_11-86A588?style=flat-square&logo=windows&logoColor=white)](./windows-overlay)
-[![YouDO Tools](https://img.shields.io/badge/YouDO_Tools-CalCU-C4A574?style=flat-square)](https://github.com/mattedhairr/YouDO)
-[![License](https://img.shields.io/badge/license-MIT-C4A574?style=flat-square)](./LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows_10_%2F_11-8FB394?style=flat-square&logo=windows&logoColor=white)](./windows-overlay)
+[![YouDO Tools](https://img.shields.io/badge/YouDO_Tools-CalCU-C9A46E?style=flat-square)](https://github.com/mattedhairr/YouDO)
+[![License](https://img.shields.io/badge/license-MIT-C9A46E?style=flat-square)](./LICENSE)
 [![Telegram](https://img.shields.io/badge/Telegram-community-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/+-manVNAPhThkMzRl)
 
 </div>
@@ -62,14 +62,19 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 
 ---
 
-## YouDO Tools & Other Projects by Jatin Parmar (`@mattedhairr`)
+## YouDO Tools
 
-| Tool / Project | Category | Description |
-|---|---|---|
-| [**YouDO**](https://github.com/mattedhairr/YouDO) | YouDO Tools | Focused execution and 6-tier goal-planning companion for serious aspirants ([Web App](https://youdo-app.vercel.app) · [Android APK](https://github.com/mattedhairr/YouDO/releases)) |
-| **CalCU** | YouDO Tools | Global hotkey (`Alt + C`) GATE Virtual Scientific Calculator overlay for Windows 10 / 11 |
-| [**8-bit RISC-V CPU**](https://github.com/mattedhairr/8-bit-CPU-RTL-to-GDSII) | VLSI / Hardware | Multi-cycle 8-bit RISC-V inspired CPU architecture (Verilog RTL to GDSII via Yosys & OpenROAD) |
-| [**4-bit ALU**](https://github.com/mattedhairr/4-bit-ALU-RTL-to-GDSII) | VLSI / Hardware | Complete RTL-to-GDSII physical design flow targeting SkyWater 130nm PDK |
+| Tool | Description |
+|---|---|
+| [**YouDO**](https://github.com/mattedhairr/YouDO) | The focus and goal-planning companion for serious aspirants ([Web App](https://youdo-app.vercel.app) · [Android APK](https://github.com/mattedhairr/YouDO/releases)) |
+| **CalCU** | Global-shortcut (`Alt + C`) GATE virtual calculator overlay for Windows 10 / 11 |
+
+### More from the developer
+
+Not part of YouDO Tools: VLSI physical design work by Jatin Parmar.
+
+- [**8-bit RISC-V Inspired CPU**](https://github.com/mattedhairr/8-bit-CPU-RTL-to-GDSII) — multi-cycle CPU from Verilog RTL to GDSII (Yosys, OpenROAD)
+- [**4-bit ALU**](https://github.com/mattedhairr/4-bit-ALU-RTL-to-GDSII) — complete RTL-to-GDSII flow targeting SkyWater 130nm
 
 ## License
 

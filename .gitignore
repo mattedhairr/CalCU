@@ -7,3 +7,6 @@ coverage/
 
 # Built locally by Install-CalCU.bat
 windows-overlay/CalCU.exe
+
+# Local Claude Code settings
+.claude/

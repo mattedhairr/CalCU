@@ -71,6 +71,11 @@ export function hotkeyLabelFor(config: WindowsOverlayConfig): string {
   return `${config.modifier}+${config.key}`;
 }
 
+// "Ctrl + Shift + C", for showing in the web page
+export function displayHotkey(config: WindowsOverlayConfig): string {
+  return [...config.modifier.split('+'), config.key].join(' + ');
+}
+
 export function buildCSharpSource(config: WindowsOverlayConfig): string {
   const mod = MODIFIER_CODES[config.modifier];
   const key = KEY_CODES[config.key];
