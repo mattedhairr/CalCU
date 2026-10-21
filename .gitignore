@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+
+# Built locally by Install-CalCU.bat
+windows-overlay/CalCU.exe
