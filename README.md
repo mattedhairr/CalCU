@@ -9,7 +9,7 @@
 
 **CalCU by [YouDO](https://youdo-app.vercel.app)** — so GATE, ESE, and PSU aspirants can solve numericals over PDFs and lectures on their laptop without switching windows or devices.
 
-[**Explore YouDO**](https://youdo-app.vercel.app) &nbsp; | &nbsp; [**YouDO Android APK**](https://github.com/mattedhairr/YouDO/releases) &nbsp; | &nbsp; [**Updates**](https://t.me/YouDO_Updates) &nbsp; | &nbsp; [**Join the discussion**](https://t.me/+-manVNAPhThkMzRl)
+[**Download CalCU**](https://calcu-youdo.vercel.app) &nbsp; | &nbsp; [**Explore YouDO**](https://youdo-app.vercel.app) &nbsp; | &nbsp; [**YouDO Android APK**](https://github.com/mattedhairr/YouDO/releases) &nbsp; | &nbsp; [**Updates**](https://t.me/YouDO_Updates) &nbsp; | &nbsp; [**Join the discussion**](https://t.me/+-manVNAPhThkMzRl)
 
 <br />
 
