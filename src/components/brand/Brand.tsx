@@ -39,16 +39,37 @@ export function CalcuWordmark({ className = 'text-[22px]' }: { className?: strin
   );
 }
 
+/**
+ * The YouDO wordmark, built like YouDO's own: the mark is the "Y", followed
+ * by a lighter "ou" and a bold "DO". Never put the mark next to the full word
+ * "YouDO", or it reads "Y YouDO". Sizes keep YouDO's ratios (32px mark, 22px
+ * text, -6px overlap).
+ */
+export function YouDoWordmark({ size = 32 }: { size?: number }) {
+  return (
+    <span className="inline-flex items-center" aria-label="YouDO" role="img">
+      <YouDoMark size={size} />
+      <span
+        className="wordmark"
+        style={{ fontSize: size * 0.6875, marginLeft: size * -0.1875 }}
+        aria-hidden="true"
+      >
+        <span className="wordmark-light">ou</span>
+        <span className="wordmark-bold">DO</span>
+      </span>
+    </span>
+  );
+}
+
 /** The "by YouDO" pill next to the CalCU wordmark; YouDO is CalCU's maker. */
 export function ByYouDoBadge() {
   return (
     <a
       href={ABOUT_YOUDO_HASH}
-      className="inline-flex items-center gap-1.5 rounded-full bg-fill px-2.5 py-1 text-xs font-medium text-content-secondary transition-colors hover:text-content-primary"
+      className="inline-flex items-center gap-1.5 rounded-full bg-fill px-3 py-1 text-xs font-medium text-content-secondary transition-colors hover:text-content-primary"
     >
       <span>by</span>
-      <YouDoMark size={13} />
-      <span className="font-semibold text-content-primary">YouDO</span>
+      <YouDoWordmark size={20} />
     </a>
   );
 }

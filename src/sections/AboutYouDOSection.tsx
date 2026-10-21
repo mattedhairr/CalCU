@@ -1,5 +1,5 @@
 import { Download, ExternalLink } from 'lucide-react';
-import { YouDoMark } from '../components/brand/Brand';
+import { YouDoWordmark } from '../components/brand/Brand';
 import { LINKS } from '../data/links';
 
 const external = { target: '_blank', rel: 'noopener noreferrer' } as const;
@@ -16,9 +16,8 @@ export function AboutYouDOSection() {
     <section id="youdo" className="card scroll-mt-24 p-6 sm:p-8">
       <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <div className="max-w-xl">
-          <div className="mb-4 flex items-center gap-3">
-            <YouDoMark size={32} />
-            <span className="eyebrow">About YouDO</span>
+          <div className="mb-4">
+            <YouDoWordmark size={36} />
           </div>
           <h2 className="mb-3 text-2xl font-bold">
             CalCU is made by YouDO. Your exam plan is a tree, not a to-do list.
