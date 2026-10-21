@@ -61,15 +61,25 @@ export function YouDoWordmark({ size = 32 }: { size?: number }) {
   );
 }
 
-/** The "by YouDO" pill next to the CalCU wordmark; YouDO is CalCU's maker. */
-export function ByYouDoBadge() {
+/**
+ * The header lockup: "CalCU | by YouDO". A hairline divider separates the
+ * product from its maker, so both wordmarks keep their full proportions
+ * instead of being squeezed into a pill. Below `sm` only CalCU shows.
+ */
+export function CalcuByYouDoLockup() {
   return (
-    <a
-      href={ABOUT_YOUDO_HASH}
-      className="inline-flex items-center gap-1.5 rounded-full bg-fill px-3 py-1 text-xs font-medium text-content-secondary transition-colors hover:text-content-primary"
-    >
-      <span>by</span>
-      <YouDoWordmark size={20} />
-    </a>
+    <div className="flex items-center gap-3">
+      <a href="#top" className="flex shrink-0 items-center">
+        <CalcuWordmark />
+      </a>
+      <span className="hidden h-[22px] w-px bg-[var(--border)] sm:block" aria-hidden="true" />
+      <a
+        href={ABOUT_YOUDO_HASH}
+        className="hidden shrink-0 items-center gap-1.5 text-[13px] text-content-secondary transition-opacity hover:opacity-80 sm:flex"
+      >
+        <span>by</span>
+        <YouDoWordmark size={26} />
+      </a>
+    </div>
   );
 }

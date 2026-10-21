@@ -1,7 +1,7 @@
 import { Moon, Sun } from 'lucide-react';
 import { ABOUT_YOUDO_HASH } from '../data/links';
 import type { Theme } from '../hooks/useTheme';
-import { ByYouDoBadge, CalcuWordmark } from './brand/Brand';
+import { CalcuByYouDoLockup } from './brand/Brand';
 
 interface SiteHeaderProps {
   theme: Theme;
@@ -31,14 +31,7 @@ export function SiteHeader({
       style={{ background: 'var(--header-bg)' }}
     >
       <div className="mx-auto flex max-w-[1100px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <a href="#top" className="shrink-0">
-            <CalcuWordmark />
-          </a>
-          <span className="hidden sm:inline-flex">
-            <ByYouDoBadge />
-          </span>
-        </div>
+        <CalcuByYouDoLockup />
 
         <nav className="hidden items-center gap-6 text-sm text-content-secondary md:flex">
           {NAV_LINKS.map((link) => (
