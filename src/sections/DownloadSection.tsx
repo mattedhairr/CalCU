@@ -84,6 +84,19 @@ export function DownloadSection({
               );
             })}
           </div>
+
+          <label className="mt-4 flex flex-wrap items-center gap-3 border-t border-subtle pt-4 text-sm">
+            <span className="font-semibold">Window opacity</span>
+            <input
+              type="range"
+              min={70}
+              max={100}
+              value={config.opacityPercent}
+              onChange={(e) => onConfigChange({ ...config, opacityPercent: Number(e.target.value) })}
+              className="w-40 cursor-pointer accent-[var(--primary)]"
+            />
+            <span className="font-mono text-xs text-content-secondary">{config.opacityPercent}%</span>
+          </label>
         </div>
 
         <div className="mb-8 flex flex-wrap gap-3">

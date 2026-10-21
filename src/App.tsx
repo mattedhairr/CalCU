@@ -70,10 +70,7 @@ export default function App() {
         setCalcState={setCalcState}
         isOpen={isCalculatorOpen}
         onClose={() => setIsCalculatorOpen(false)}
-        hotkeyLabel={hotkey}
-        activeHighlightKey={null}
         opacity={winConfig.opacityPercent}
-        setOpacity={(opacityPercent) => setWinConfig((prev) => ({ ...prev, opacityPercent }))}
       />
 
       <CalcuPage
