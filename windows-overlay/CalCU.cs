@@ -42,11 +42,15 @@ namespace CalCU
         // margin and hands the calculator's own controls to this window:
         // dragging the blue bar moves the window, _ and X hide it, and so does
         // Esc. The page's own _ would fold the keys away, and its X does nothing.
+        // The title and the cube-root key use the browser's default text size,
+        // which the engine already enlarges for display scaling; pinning them
+        // to 16px stops them being scaled twice (once more by the page zoom).
         private const string PAGE_SCRIPT = @"
 (function () {
     var $ = window.jQuery;
     if (!$ || window.calcuReady) return;
     window.calcuReady = true;
+    $('#helptopDiv, #keyPad font').css('font-size', '16px');
     $('.calc_min').die('click');
     $('.calc_max').die('click');
     $('#calc_min, #closeButton').unbind('click').click(function () {
@@ -62,6 +66,9 @@ namespace CalCU
         if (e.keyCode === 27) window.external.EscapePressed();
     });
 })();";
+
+        [DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
 
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
@@ -83,13 +90,23 @@ namespace CalCU
         private WebBrowser browser;
         private NotifyIcon trayIcon;
 
+        // Display scaling (1.0 at 100%, 2.0 at 200%). CalCU draws at the real
+        // resolution and zooms the page by this much, instead of letting
+        // Windows stretch a 100% picture, which looks blurry.
+        private readonly float dpiScale;
+
         public OverlayForm()
         {
             SetBrowserFeatureControl();
 
+            using (Graphics screen = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                dpiScale = screen.DpiX / 96f;
+            }
+
             this.Text = "CalCU - GATE Calculator (" + HOTKEY_LABEL + ")";
             this.FormBorderStyle = FormBorderStyle.None;
-            this.ClientSize = new Size(CALC_WIDTH, CALC_HEIGHT);
+            this.ClientSize = new Size(Scaled(CALC_WIDTH), Scaled(CALC_HEIGHT));
             this.TopMost = ALWAYS_ON_TOP;
             this.Opacity = WINDOW_OPACITY;
             this.ShowInTaskbar = false;
@@ -104,9 +121,9 @@ namespace CalCU
             {
                 this.StartPosition = FormStartPosition.Manual;
                 int top = START_POSITION == "BottomRight"
-                    ? workArea.Bottom - this.Height - 24
-                    : workArea.Top + 24;
-                this.Location = new Point(workArea.Right - this.Width - 24, top);
+                    ? workArea.Bottom - this.Height - Scaled(24)
+                    : workArea.Top + Scaled(24);
+                this.Location = new Point(workArea.Right - this.Width - Scaled(24), top);
             }
 
             browser = new WebBrowser
@@ -144,12 +161,18 @@ namespace CalCU
         {
             HtmlDocument doc = browser.Document;
             if (doc == null || doc.Body == null) return;
-            doc.Body.Style = "margin:0;overflow:hidden";
+            doc.Body.Style = "margin:0;overflow:hidden;zoom:" +
+                dpiScale.ToString(System.Globalization.CultureInfo.InvariantCulture);
             try
             {
                 doc.InvokeScript("eval", new object[] { PAGE_SCRIPT });
             }
             catch { }
+        }
+
+        private int Scaled(int pixels)
+        {
+            return (int)Math.Round(pixels * dpiScale);
         }
 
         // Called from the page (see PAGE_SCRIPT) through CalculatorBridge.
@@ -230,6 +253,9 @@ namespace CalCU
         [STAThread]
         public static void Main()
         {
+            // Tell Windows CalCU handles display scaling itself (see dpiScale),
+            // so it is not stretched into a blurry picture.
+            SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new OverlayForm());
