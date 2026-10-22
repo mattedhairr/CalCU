@@ -90,13 +90,19 @@ namespace CalCU
         private WebBrowser browser;
         private NotifyIcon trayIcon;
 
+        // CalCU starts hidden (it starts with Windows) and only appears on the
+        // shortcut or the tray icon. The installer passes /show so you can see
+        // the install worked.
+        private bool allowShow;
+
         // Display scaling (1.0 at 100%, 2.0 at 200%). CalCU draws at the real
         // resolution and zooms the page by this much, instead of letting
         // Windows stretch a 100% picture, which looks blurry.
         private readonly float dpiScale;
 
-        public OverlayForm()
+        public OverlayForm(bool showAtStart)
         {
+            allowShow = showAtStart;
             SetBrowserFeatureControl();
 
             using (Graphics screen = Graphics.FromHwnd(IntPtr.Zero))
@@ -192,6 +198,18 @@ namespace CalCU
             if (HIDE_ON_ESCAPE) this.Hide();
         }
 
+        // Keeps the window hidden until it is asked for, while still creating
+        // its handle so the shortcut is registered.
+        protected override void SetVisibleCore(bool value)
+        {
+            if (!allowShow)
+            {
+                value = false;
+                if (!IsHandleCreated) CreateHandle();
+            }
+            base.SetVisibleCore(value);
+        }
+
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
@@ -230,6 +248,7 @@ namespace CalCU
             }
             else
             {
+                allowShow = true;
                 this.Show();
                 this.WindowState = FormWindowState.Normal;
                 this.Activate();
@@ -258,7 +277,9 @@ namespace CalCU
             SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new OverlayForm());
+            bool showAtStart = Array.Exists(Environment.GetCommandLineArgs(),
+                arg => string.Equals(arg, "/show", StringComparison.OrdinalIgnoreCase));
+            Application.Run(new OverlayForm(showAtStart));
         }
     }
 

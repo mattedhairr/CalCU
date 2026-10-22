@@ -59,12 +59,15 @@ if not "%BUILD_RESULT%"=="0" (
 echo [2/3] Setting CalCU to start with Windows...
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" /t REG_SZ /d "\"%~dp0CalCU.exe\"" /f >nul
 
+:: /show opens the calculator once so you can see it works. After a restart
+:: CalCU starts hidden and waits for the shortcut.
 echo [3/3] Starting CalCU.exe...
-start "" "%~dp0CalCU.exe"
+start "" "%~dp0CalCU.exe" /show
 echo.
 echo   HOW TO USE
 echo   - Press %HOTKEY% anywhere on Windows to show / hide the calculator.
-echo   - CalCU now starts with Windows. Turn that off in Task Manager - Startup apps.
+echo   - CalCU now starts with Windows, hidden until you press %HOTKEY%.
+echo     Turn that off in Task Manager - Startup apps.
 echo   - Right-click the CalCU tray icon near the clock to exit.
 echo   - Run Uninstall-CalCU.bat to remove it.
 echo.
