@@ -43,7 +43,20 @@ if errorlevel 1 (
     copy /y "%~dp0CalCU.cs" "%SRC%" >nul
 )
 
-echo [1/3] Building CalCU.exe with the C# compiler built into Windows...
+:: An earlier install may be in another folder, which the startup entry records.
+:: Remove that CalCU.exe (only ever a file named CalCU.exe, whatever the entry
+:: says) and the one here, so this install is the only copy left. The build
+:: below always puts a fresh CalCU.exe here. Older setups may also have started
+:: CalCU from a Startup-folder shortcut, which would start a second copy.
+echo [1/4] Removing any earlier CalCU...
+set "OLD_EXE="
+for /f "tokens=2,*" %%A in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" 2^>nul ^| findstr /c:"REG_SZ"') do set "OLD_EXE=%%~B"
+if defined OLD_EXE for %%F in ("%OLD_EXE%") do if /i not "%%~nxF"=="CalCU.exe" set "OLD_EXE="
+if defined OLD_EXE call :DeleteWhenReleased "%OLD_EXE%"
+call :DeleteWhenReleased "%~dp0CalCU.exe"
+if exist "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk" del /F /Q "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk"
+
+echo [2/4] Building CalCU.exe with the C# compiler built into Windows...
 "%CSC%" /nologo /target:winexe /out:"%~dp0CalCU.exe" "%SRC%"
 set "BUILD_RESULT=%ERRORLEVEL%"
 del "%SRC%" >nul 2>&1
@@ -56,12 +69,12 @@ if not "%BUILD_RESULT%"=="0" (
 
 :: Per-user startup entry (no admin rights needed). It points at this folder,
 :: so moving the folder means running the installer again.
-echo [2/3] Setting CalCU to start with Windows...
+echo [3/4] Setting CalCU to start with Windows...
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" /t REG_SZ /d "\"%~dp0CalCU.exe\"" /f >nul
 
 :: /show opens the calculator once so you can see it works. After a restart
 :: CalCU starts hidden and waits for the shortcut.
-echo [3/3] Starting CalCU.exe...
+echo [4/4] Starting CalCU.exe...
 start "" "%~dp0CalCU.exe" /show
 echo.
 echo   HOW TO USE
@@ -72,5 +85,16 @@ echo   - Right-click the CalCU tray icon near the clock to exit.
 echo   - Run Uninstall-CalCU.bat to remove it.
 echo.
 pause
+exit /b 0
+
+:: Deletes the file if it exists. A program that was just stopped can keep its
+:: file locked for a moment, so this tries again for up to 10 seconds.
+:DeleteWhenReleased
+for /l %%T in (1,1,10) do (
+    if not exist "%~1" exit /b 0
+    del /F /Q "%~1" >nul 2>&1
+    if exist "%~1" ping -n 2 127.0.0.1 >nul
+)
+if exist "%~1" echo   Could not delete "%~1". Close CalCU and delete it by hand.
 exit /b 0
 ::CALCU-CSHARP-BELOW
