@@ -43,6 +43,10 @@ if errorlevel 1 (
     copy /y "%~dp0CalCU.cs" "%SRC%" >nul
 )
 
+:: The version lives in one line of CalCU.cs: public const string Version = "x.y.z";
+set "VERSION="
+for /f "tokens=2 delims==;" %%V in ('findstr /c:"public const string Version" "%SRC%"') do for %%W in (%%V) do set "VERSION=%%~W"
+
 :: An earlier install may be in another folder, which the startup entry records.
 :: Remove that CalCU.exe (only ever a file named CalCU.exe, whatever the entry
 :: says) and the one here, so this install is the only copy left. The build
@@ -56,7 +60,7 @@ if defined OLD_EXE call :DeleteWhenReleased "%OLD_EXE%"
 call :DeleteWhenReleased "%~dp0CalCU.exe"
 if exist "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk" del /F /Q "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk"
 
-echo [2/4] Building CalCU.exe with the C# compiler built into Windows...
+echo [2/4] Building CalCU v%VERSION% with the C# compiler built into Windows...
 "%CSC%" /nologo /target:winexe /out:"%~dp0CalCU.exe" "%SRC%"
 set "BUILD_RESULT=%ERRORLEVEL%"
 del "%SRC%" >nul 2>&1
@@ -76,6 +80,8 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" /t REG_S
 :: CalCU starts hidden and waits for the shortcut.
 echo [4/4] Starting CalCU.exe...
 start "" "%~dp0CalCU.exe" /show
+echo.
+echo   CalCU v%VERSION% is installed.
 echo.
 echo   HOW TO USE
 echo   - Press %HOTKEY% anywhere on Windows to show / hide the calculator.

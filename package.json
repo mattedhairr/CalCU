@@ -1,7 +1,6 @@
 {
   "name": "calcu",
   "private": true,
-  "version": "1.0.0",
   "description": "CalCU by YouDO. Global-hotkey GATE virtual calculator overlay for Windows.",
   "license": "MIT",
   "author": "Jatin Parmar (@mattedhairr)",

@@ -45,6 +45,13 @@ const KEY_CODES: Record<
   Space: { hex: '0x20', desc: 'VK_SPACE' },
 };
 
+// CalCU's version, read from its one line in CalCU.cs.
+const versionMatch = /public const string Version = "([^"]+)";/.exec(csharpTemplate);
+if (!versionMatch) {
+  throw new Error('CalCU.cs is missing the Version line');
+}
+export const CALCU_VERSION = versionMatch[1];
+
 // The templates are edited as LF here and handed out as CRLF: batch files
 // must use CRLF, and .cs files are kept CRLF to match.
 const toLf = (text: string) => text.replace(/\r\n/g, '\n');

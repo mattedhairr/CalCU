@@ -13,6 +13,7 @@
 
 <br />
 
+[![Release](https://img.shields.io/github/v/release/mattedhairr/CalCU?style=flat-square&color=C9A46E)](https://github.com/mattedhairr/CalCU/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows_10_%2F_11-8FB394?style=flat-square&logo=windows&logoColor=white)](./windows-overlay)
 [![by YouDO](https://img.shields.io/badge/by-YouDO-C9A46E?style=flat-square)](https://github.com/mattedhairr/YouDO)
 [![License](https://img.shields.io/badge/license-MIT-C9A46E?style=flat-square)](./LICENSE)

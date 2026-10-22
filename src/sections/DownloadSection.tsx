@@ -1,5 +1,6 @@
 import { Calculator, Download, Trash2 } from 'lucide-react';
-import type { WindowsOverlayConfig } from '../utils/windowsOverlay';
+import { LINKS } from '../data/links';
+import { CALCU_VERSION, type WindowsOverlayConfig } from '../utils/windowsOverlay';
 
 type HotkeyPreset = Pick<WindowsOverlayConfig, 'modifier' | 'key'> & { label: string };
 
@@ -99,7 +100,7 @@ export function DownloadSection({
           </label>
         </div>
 
-        <div className="mb-8 flex flex-wrap gap-3">
+        <div className="mb-3 flex flex-wrap gap-3">
           <button type="button" onClick={onDownloadInstaller} className="btn btn-primary">
             <Download className="h-4 w-4" />
             Download Install-CalCU.bat
@@ -115,6 +116,18 @@ export function DownloadSection({
             </button>
           )}
         </div>
+        <p className="mb-8 text-xs text-content-secondary">
+          Version {CALCU_VERSION} ·{' '}
+          <a
+            href={LINKS.calcuReleases}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-content-primary"
+          >
+            What's new
+          </a>
+          . Already installed? Run the new installer to update; it replaces the old copy.
+        </p>
       </div>
 
       <ol className="grid grid-cols-1 gap-5 border-t border-subtle pt-6 text-sm sm:grid-cols-3">

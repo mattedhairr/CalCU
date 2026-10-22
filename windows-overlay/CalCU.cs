@@ -12,12 +12,29 @@
 
 using System;
 using System.Drawing;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
+// Shown in CalCU.exe > Properties > Details.
+[assembly: AssemblyTitle("CalCU by YouDO")]
+[assembly: AssemblyProduct("CalCU by YouDO")]
+[assembly: AssemblyCopyright("MIT License")]
+[assembly: AssemblyVersion(CalCU.Release.Version + ".0")]
+[assembly: AssemblyFileVersion(CalCU.Release.Version + ".0")]
+[assembly: AssemblyInformationalVersion(CalCU.Release.Version)]
+
 namespace CalCU
 {
+    public static class Release
+    {
+        // The one place the version lives. The installer, the website and the
+        // GitHub release all read it from this line, so bump it for every
+        // release and keep it in this form.
+        public const string Version = "1.1.0";
+    }
+
     public class OverlayForm : Form
     {
         // ---- Settings -------------------------------------------------------
@@ -145,6 +162,9 @@ namespace CalCU
             this.Controls.Add(browser);
 
             ContextMenu trayMenu = new ContextMenu();
+            MenuItem versionItem = trayMenu.MenuItems.Add("CalCU by YouDO v" + Release.Version);
+            versionItem.Enabled = false;
+            trayMenu.MenuItems.Add("-");
             trayMenu.MenuItems.Add("Toggle CalCU (" + HOTKEY_LABEL + ")", (s, e) => ToggleOverlay());
             trayMenu.MenuItems.Add("Reload Calculator", (s, e) => browser.Navigate(CALCULATOR_URL));
             trayMenu.MenuItems.Add("-");
@@ -155,7 +175,7 @@ namespace CalCU
 
             trayIcon = new NotifyIcon
             {
-                Text = "CalCU - GATE Calculator (" + HOTKEY_LABEL + ")",
+                Text = "CalCU v" + Release.Version + " - GATE Calculator (" + HOTKEY_LABEL + ")",
                 Icon = SystemIcons.Application,
                 ContextMenu = trayMenu,
                 Visible = true

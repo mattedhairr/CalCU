@@ -1,4 +1,5 @@
 import { ABOUT_YOUDO_HASH, LINKS } from '../data/links';
+import { CALCU_VERSION } from '../utils/windowsOverlay';
 import { YouDoWordmark } from './brand/Brand';
 
 const FOOTER_LINKS = [
@@ -15,6 +16,15 @@ export function SiteFooter() {
           <a href={ABOUT_YOUDO_HASH} className="flex items-center gap-1.5 hover:text-content-primary">
             <span>CalCU by</span>
             <YouDoWordmark size={18} />
+          </a>
+          <span aria-hidden="true">·</span>
+          <a
+            href={LINKS.calcuReleases}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-content-primary"
+          >
+            v{CALCU_VERSION}
           </a>
           <span aria-hidden="true">·</span>
           <span>MIT License</span>
