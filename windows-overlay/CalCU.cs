@@ -32,7 +32,7 @@ namespace CalCU
         // The one place the version lives. The installer, the website and the
         // GitHub release all read it from this line, so bump it for every
         // release and keep it in this form.
-        public const string Version = "1.1.0";
+        public const string Version = "1.2.0";
     }
 
     public class OverlayForm : Form

@@ -3,7 +3,7 @@
 # CalCU
 
 ### Your numerical practice needs focus. Not window resizing.
-**Press `Alt + C` to summon the GATE Virtual Calculator anywhere on Windows. Press it again to vanish.**
+**Press `Alt + C` to summon the GATE Virtual Calculator anywhere on Windows or Linux. Press it again to vanish.**
 
 <br />
 
@@ -15,6 +15,7 @@
 
 [![Release](https://img.shields.io/github/v/release/mattedhairr/CalCU?style=flat-square&color=C9A46E)](https://github.com/mattedhairr/CalCU/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows_10_%2F_11-8FB394?style=flat-square&logo=windows&logoColor=white)](./windows-overlay)
+[![Platform](https://img.shields.io/badge/platform-Linux-8FB394?style=flat-square&logo=linux&logoColor=white)](./linux-overlay)
 [![by YouDO](https://img.shields.io/badge/by-YouDO-C9A46E?style=flat-square)](https://github.com/mattedhairr/YouDO)
 [![License](https://img.shields.io/badge/license-MIT-C9A46E?style=flat-square)](./LICENSE)
 [![Telegram](https://img.shields.io/badge/Telegram-community-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/+-manVNAPhThkMzRl)
@@ -44,6 +45,22 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 
 ---
 
+## Quick Start on Linux
+
+Everything lives in the [`/linux-overlay`](./linux-overlay) folder. Keep **`calcu.py`** next to the installer (or download the single-file installer from the website), then run:
+
+```bash
+bash install-calcu.sh
+```
+
+- **What it needs:** Python, GTK 3 and WebKitGTK from your distribution's packages. If any are missing, the installer shows the command and asks before using `sudo`.
+- **The shortcut:** Wayland doesn't let an app claim a global key itself, so the shortcut belongs to your desktop. On GNOME the installer sets `Alt + C` for you. On other desktops, add a custom shortcut in your keyboard settings that runs `~/.local/bin/calcu --toggle`.
+- **Always on top:** CalCU runs through XWayland, so a desktop with no X11 support can't keep it on top.
+- **What it installs:** files for your user only, in `~/.local` and `~/.config`, and it starts when you log in.
+- **To remove it:** run `bash uninstall-calcu.sh`. It leaves the system packages in place, because other apps may use them.
+
+---
+
 ## Is CalCU 100% Safe? (Security & Transparency)
 
 **Yes — 100% transparent, plain-text, and compiled locally by Windows.**
@@ -52,13 +69,15 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 2. **Compiled Locally by Microsoft Windows:** The script uses the official Microsoft C# compiler (`C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe`) pre-installed on every Windows 10 and Windows 11 PC.
 3. **Zero Admin Rights Required:** Runs in standard user mode, uses ~15 MB RAM, installs no background services or drivers, and only registers your `Alt + C` shortcut via the standard Win32 `RegisterHotKey` API (`user32.dll`).
 
+On Linux there is nothing to compile: `install-calcu.sh` and `calcu.py` are plain text too, and CalCU runs as your user. The only time it needs `sudo` is to install missing packages, and the installer asks first.
+
 ---
 
 ## Copyright, Legal & Open-Source Ownership (MIT License)
 
-1. **100% Original Clean-Room Code:** Every line of React, TypeScript, C#, and Batch code in this repository is written from scratch under the **MIT License**.
+1. **100% Original Clean-Room Code:** Every line of React, TypeScript, C#, Python, Shell, and Batch code in this repository is written from scratch under the **MIT License**.
 2. **Functional Mechanics Are Not Copyrightable:** Mathematical formulas, post-fix button order, and scientific calculator layouts are utilitarian mechanics and are not subject to copyright protection.
-3. **Zero Proprietary Assets Redistributed:** This repository does not host or redistribute any proprietary third-party code, images, or logos. When the Windows overlay opens the official calculator URL inside a `WebBrowser` frame, it acts strictly as a lightweight user browser bookmark.
+3. **Zero Proprietary Assets Redistributed:** This repository does not host or redistribute any proprietary third-party code, images, or logos. When the overlay opens the official calculator URL inside a browser frame, it acts strictly as a lightweight user browser bookmark.
 4. **Non-Affiliation Disclaimer:** *GATE* and *TCS iON* are trademarks/names of their respective owners. **CalCU** is an independent, student-built open-source study utility by **YouDO** and is not affiliated with or endorsed by them.
 
 ---

@@ -6,7 +6,18 @@ import { useOverlayHotkey } from './hooks/useOverlayHotkey';
 import { useTheme } from './hooks/useTheme';
 import { CalcuPage } from './pages/CalcuPage';
 import type { SourceFile } from './sections/SourceFilesSection';
-import { BAT_MIME, downloadTextFile } from './utils/download';
+import {
+  BAT_MIME,
+  Platform,
+  SH_MIME,
+  detectPlatform,
+  downloadTextFile,
+} from './utils/download';
+import {
+  LINUX_UNINSTALL_SCRIPT,
+  buildLinuxInstallScript,
+  buildPythonSource,
+} from './utils/linuxOverlay';
 import {
   INITIAL_CALCULATOR_STATE,
   TCSCalculatorState,
@@ -30,6 +41,7 @@ export default function App() {
     () => window.matchMedia('(min-width: 768px)').matches
   );
   const [winConfig, setWinConfig] = useState<WindowsOverlayConfig>(DEFAULT_WINDOWS_CONFIG);
+  const [platform, setPlatform] = useState<Platform>(detectPlatform);
 
   useOverlayHotkey(winConfig, isCalculatorOpen, setIsCalculatorOpen);
 
@@ -41,18 +53,60 @@ export default function App() {
   }, []);
 
   const hotkey = displayHotkey(winConfig);
-  const installBat = buildInstallScript(winConfig);
+  const installer: SourceFile =
+    platform === 'linux'
+      ? {
+          id: 'install',
+          filename: 'install-calcu.sh',
+          content: buildLinuxInstallScript(winConfig),
+          mime: SH_MIME,
+        }
+      : {
+          id: 'install',
+          filename: 'Install-CalCU.bat',
+          content: buildInstallScript(winConfig),
+          mime: BAT_MIME,
+        };
+  const uninstaller: SourceFile =
+    platform === 'linux'
+      ? {
+          id: 'uninstall',
+          filename: 'uninstall-calcu.sh',
+          content: LINUX_UNINSTALL_SCRIPT,
+          mime: SH_MIME,
+        }
+      : {
+          id: 'uninstall',
+          filename: 'Uninstall-CalCU.bat',
+          content: UNINSTALL_SCRIPT,
+          mime: BAT_MIME,
+        };
+  const program: SourceFile =
+    platform === 'linux'
+      ? {
+          id: 'program',
+          filename: 'calcu.py',
+          content: buildPythonSource(winConfig),
+          mime: 'text/plain',
+        }
+      : {
+          id: 'program',
+          filename: 'CalCU.cs',
+          content: buildCSharpSource(winConfig),
+          mime: 'text/plain',
+        };
 
   const sourceFiles: SourceFile[] = [
-    { id: 'install', filename: 'Install-CalCU.bat', content: installBat, mime: BAT_MIME },
-    { id: 'uninstall', filename: 'Uninstall-CalCU.bat', content: UNINSTALL_SCRIPT, mime: BAT_MIME },
-    { id: 'csharp', filename: 'CalCU.cs', content: buildCSharpSource(winConfig), mime: 'text/plain' },
+    installer,
+    uninstaller,
+    program,
     { id: 'readme', filename: 'README.md', content: README_MARKDOWN, mime: 'text/markdown' },
   ];
 
-  const downloadInstaller = () => downloadTextFile('Install-CalCU.bat', installBat, BAT_MIME);
-  const downloadUninstaller = () =>
-    downloadTextFile('Uninstall-CalCU.bat', UNINSTALL_SCRIPT, BAT_MIME);
+  const downloadFile = (file: SourceFile) =>
+    downloadTextFile(file.filename, file.content, file.mime);
+  const downloadInstaller = () => downloadFile(installer);
+  const downloadUninstaller = () => downloadFile(uninstaller);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -76,6 +130,8 @@ export default function App() {
       <CalcuPage
         config={winConfig}
         onConfigChange={setWinConfig}
+        platform={platform}
+        onPlatformChange={setPlatform}
         hotkey={hotkey}
         isCalculatorOpen={isCalculatorOpen}
         onShowCalculator={() => setIsCalculatorOpen(true)}

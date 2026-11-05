@@ -11,3 +11,13 @@ export function downloadTextFile(filename: string, content: string, mime: string
 }
 
 export const BAT_MIME = 'application/x-bat';
+export const SH_MIME = 'application/x-sh';
+
+export type Platform = 'windows' | 'linux';
+
+// Desktop Linux starts on the Linux download. Android also says "Linux" but
+// can't run either app, so it keeps the default.
+export function detectPlatform(): Platform {
+  const agent = window.navigator.userAgent;
+  return /Linux/.test(agent) && !/Android/.test(agent) ? 'linux' : 'windows';
+}
