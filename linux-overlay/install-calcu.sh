@@ -12,8 +12,11 @@ HOTKEY="Alt+C"
 
 SYSTEM_PYTHON=/usr/bin/python3
 BIN="$HOME/.local/bin/calcu"
-MENU_ENTRY="$HOME/.local/share/applications/calcu.desktop"
+# Named after the app's ID, so GNOME shows CalCU's update notification.
+MENU_ENTRY="$HOME/.local/share/applications/com.mattedhairr.CalCU.desktop"
+OLD_MENU_ENTRY="$HOME/.local/share/applications/calcu.desktop"
 AUTOSTART_ENTRY="$HOME/.config/autostart/calcu.desktop"
+STATE_DIR="$HOME/.config/calcu"
 GNOME_SCHEMA=org.gnome.settings-daemon.plugins.media-keys
 GNOME_PATH=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/calcu/
 
@@ -136,7 +139,7 @@ set_gnome_shortcut() {
     list="$(gsettings get "$GNOME_SCHEMA" custom-keybindings)" || return 1
     case "$list" in
         *"'$GNOME_PATH'"*) new_list="$list" ;;
-        "[]" | "@as []") new_list="['$GNOME_PATH']" ;;
+        "[]" | "@as []" | "") new_list="['$GNOME_PATH']" ;;
         *) new_list="${list%]}, '$GNOME_PATH']" ;;
     esac
     local item="$GNOME_SCHEMA.custom-keybinding:$GNOME_PATH"
@@ -147,6 +150,31 @@ set_gnome_shortcut() {
         gsettings set "$GNOME_SCHEMA" custom-keybindings "$new_list"
 }
 
+# Removes CalCU from GNOME's custom shortcuts, keeping all the others.
+# Same as in uninstall-calcu.sh; keep the two in step.
+remove_gnome_shortcut() {
+    command -v gsettings >/dev/null 2>&1 || return 0
+    local list new_list
+    list="$(gsettings get "$GNOME_SCHEMA" custom-keybindings 2>/dev/null)" || return 0
+    case "$list" in
+        *"'$GNOME_PATH'"*) ;;
+        *) return 0 ;;
+    esac
+    new_list="${list//"'$GNOME_PATH', "/}"
+    new_list="${new_list//", '$GNOME_PATH'"/}"
+    new_list="${new_list//"'$GNOME_PATH'"/}"
+    gsettings set "$GNOME_SCHEMA" custom-keybindings "$new_list"
+    gsettings reset-recursively "$GNOME_SCHEMA.custom-keybinding:$GNOME_PATH"
+}
+
+# Everything uninstall-calcu.sh removes, so an update starts from a clean slate.
+remove_existing() {
+    [ -x "$BIN" ] && "$BIN" --quit >/dev/null 2>&1
+    rm -f "$BIN" "$MENU_ENTRY" "$OLD_MENU_ENTRY" "$AUTOSTART_ENTRY"
+    rm -rf "$STATE_DIR"
+    remove_gnome_shortcut
+}
+
 main() {
     echo "============================================================================"
     echo "  CalCU by YouDO"
@@ -154,25 +182,27 @@ main() {
     echo "============================================================================"
     echo
 
-    echo "[1/5] Checking for GTK 3 and WebKitGTK..."
+    echo "[1/6] Checking for GTK 3 and WebKitGTK..."
     ensure_dependencies
 
-    echo "[2/5] Installing CalCU to ~/.local/bin..."
-    [ -x "$BIN" ] && "$BIN" --quit >/dev/null 2>&1
+    echo "[2/6] Removing any earlier CalCU..."
+    remove_existing
+
+    echo "[3/6] Installing CalCU to ~/.local/bin..."
     mkdir -p "$(dirname "$BIN")" || fail "Could not create $(dirname "$BIN")."
     write_program "$BIN"
 
-    echo "[3/5] Setting CalCU to start when you log in..."
+    echo "[4/6] Setting CalCU to start when you log in..."
     write_desktop_entry "$MENU_ENTRY" " --toggle"
     write_desktop_entry "$AUTOSTART_ENTRY" ""
 
-    echo "[4/5] Setting the $HOTKEY shortcut..."
+    echo "[5/6] Setting the $HOTKEY shortcut..."
     local shortcut_set=no
     if is_gnome && set_gnome_shortcut; then
         shortcut_set=yes
     fi
 
-    echo "[5/5] Starting CalCU..."
+    echo "[6/6] Starting CalCU..."
     nohup "$BIN" --show >/dev/null 2>&1 &
     disown
 

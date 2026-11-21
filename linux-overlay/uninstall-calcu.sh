@@ -12,6 +12,7 @@ GNOME_SCHEMA=org.gnome.settings-daemon.plugins.media-keys
 GNOME_PATH=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/calcu/
 
 # Removes CalCU from GNOME's custom shortcuts, keeping all the others.
+# Same as in install-calcu.sh; keep the two in step.
 remove_gnome_shortcut() {
     command -v gsettings >/dev/null 2>&1 || return 0
     local list new_list
@@ -35,10 +36,12 @@ echo
 echo "[1/3] Stopping CalCU..."
 [ -x "$BIN" ] && "$BIN" --quit >/dev/null 2>&1
 
-echo "[2/3] Removing CalCU and starting at login..."
+echo "[2/3] Removing CalCU, starting at login and its saved state..."
 rm -f "$BIN" \
+    "$HOME/.local/share/applications/com.mattedhairr.CalCU.desktop" \
     "$HOME/.local/share/applications/calcu.desktop" \
     "$HOME/.config/autostart/calcu.desktop"
+rm -rf "$HOME/.config/calcu"
 
 echo "[3/3] Removing the keyboard shortcut..."
 remove_gnome_shortcut

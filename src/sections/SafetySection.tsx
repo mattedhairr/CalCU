@@ -32,11 +32,16 @@ const SAFETY_POINTS: Record<Platform, { lead: string; text: string }[]> = {
   ],
 };
 
+const UPDATE_POINT = {
+  lead: 'Tells you about updates.',
+  text: 'Once a day CalCU reads the latest version number from this website, and sends nothing about you. A newer version is shown once, with a link to this page; nothing downloads by itself.',
+};
+
 const cards = (platform: Platform) => [
   {
     icon: <ShieldCheck className="h-5 w-5 text-success" />,
     title: 'Safe and transparent',
-    points: SAFETY_POINTS[platform],
+    points: [...SAFETY_POINTS[platform], UPDATE_POINT],
   },
   {
     icon: <Scale className="h-5 w-5 text-primary" />,

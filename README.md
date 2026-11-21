@@ -41,7 +41,7 @@ All native Windows scripts live in the [`/windows-overlay`](./windows-overlay) f
 
 | 1. Install (`2 sec`) | 2. Solve (`Alt + C`) | 3. Uninstall (`1 click`) |
 |---|---|---|
-| Keep **`CalCU.cs`** next to it and double-click **`Install-CalCU.bat`** (or download the single-file installer from the website). It uses Windows' built-in `.NET` compiler (`csc.exe`) to build a tiny `~11 KB` **`CalCU.exe`** that runs from your system tray and starts with Windows (turn that off in Task Manager → Startup apps). | Press **`Alt + C`** over any PDF, test series, or video lecture to pop up or hide the GATE calculator. | Double-click **`Uninstall-CalCU.bat`** anytime to stop the process, delete `CalCU.exe`, and remove its startup entry and registry value. |
+| Keep **`CalCU.cs`** next to it and double-click **`Install-CalCU.bat`** (or download the single-file installer from the website). It uses Windows' built-in `.NET` compiler (`csc.exe`) to build a tiny `~11 KB` **`CalCU.exe`** that runs from your system tray and starts with Windows (turn that off in Task Manager → Startup apps). | Press **`Alt + C`** over any PDF, test series, or video lecture to pop up or hide the GATE calculator. | Double-click **`Uninstall-CalCU.bat`** anytime to stop the process, delete `CalCU.exe`, and remove its startup entry and registry values. |
 
 ---
 
@@ -70,6 +70,8 @@ bash install-calcu.sh
 3. **Zero Admin Rights Required:** Runs in standard user mode, uses ~15 MB RAM, installs no background services or drivers, and only registers your `Alt + C` shortcut via the standard Win32 `RegisterHotKey` API (`user32.dll`).
 
 On Linux there is nothing to compile: `install-calcu.sh` and `calcu.py` are plain text too, and CalCU runs as your user. The only time it needs `sudo` is to install missing packages, and the installer asks first.
+
+**Updates:** once a day CalCU reads the latest version number from [calcu-youdo.vercel.app/version.json](https://calcu-youdo.vercel.app/version.json), and sends nothing about you. When a newer version exists, it shows a notification once and adds "Update to …" to its tray menu; both open the website. Nothing downloads or installs by itself. Run the new installer to update: it removes everything from the old copy first. To turn the check off, set `CHECK_FOR_UPDATES` to false at the top of `CalCU.cs` or `calcu.py`.
 
 ---
 

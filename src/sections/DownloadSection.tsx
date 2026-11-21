@@ -50,7 +50,7 @@ const STEPS = (hotkey: string, platform: Platform) => [
       }
     : {
         title: 'Uninstall in one click',
-        body: 'Uninstall-CalCU.bat stops CalCU and removes the app, its startup entry and its registry value.',
+        body: 'Uninstall-CalCU.bat stops CalCU and removes the app, its startup entry and its registry values.',
       },
 ];
 

@@ -26,9 +26,10 @@ call :DeleteWhenReleased "%~dp0GateCalcOverlay.exe"
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" /f >nul 2>&1
 if exist "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk" del /F /Q "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk"
 
-echo [3/3] Removing the per-user browser emulation registry value...
+echo [3/3] Removing CalCU's registry values...
 reg delete "HKCU\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION" /v "CalCU.exe" /f >nul 2>&1
 reg delete "HKCU\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION" /v "GateCalcOverlay.exe" /f >nul 2>&1
+reg delete "HKCU\Software\CalCU" /f >nul 2>&1
 
 echo.
 echo ============================================================================

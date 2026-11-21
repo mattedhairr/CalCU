@@ -47,18 +47,25 @@ if errorlevel 1 (
 set "VERSION="
 for /f "tokens=2 delims==;" %%V in ('findstr /c:"public const string Version" "%SRC%"') do for %%W in (%%V) do set "VERSION=%%~W"
 
-:: An earlier install may be in another folder, which the startup entry records.
-:: Remove that CalCU.exe (only ever a file named CalCU.exe, whatever the entry
-:: says) and the one here, so this install is the only copy left. The build
-:: below always puts a fresh CalCU.exe here. Older setups may also have started
-:: CalCU from a Startup-folder shortcut, which would start a second copy.
+:: Removes everything Uninstall-CalCU.bat removes, so an update starts from a
+:: clean slate; keep the two in step. An earlier install may be in another
+:: folder, which the startup entry records. Remove that CalCU.exe (only ever a
+:: file named CalCU.exe, whatever the entry says) and the one here, so this
+:: install is the only copy left. The build below always puts a fresh CalCU.exe
+:: here. Older setups may also have started CalCU from a Startup-folder
+:: shortcut, which would start a second copy.
 echo [1/4] Removing any earlier CalCU...
 set "OLD_EXE="
 for /f "tokens=2,*" %%A in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" 2^>nul ^| findstr /c:"REG_SZ"') do set "OLD_EXE=%%~B"
 if defined OLD_EXE for %%F in ("%OLD_EXE%") do if /i not "%%~nxF"=="CalCU.exe" set "OLD_EXE="
 if defined OLD_EXE call :DeleteWhenReleased "%OLD_EXE%"
 call :DeleteWhenReleased "%~dp0CalCU.exe"
+call :DeleteWhenReleased "%~dp0GateCalcOverlay.exe"
 if exist "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk" del /F /Q "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CalCU.lnk"
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "CalCU" /f >nul 2>&1
+reg delete "HKCU\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION" /v "CalCU.exe" /f >nul 2>&1
+reg delete "HKCU\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION" /v "GateCalcOverlay.exe" /f >nul 2>&1
+reg delete "HKCU\Software\CalCU" /f >nul 2>&1
 
 echo [2/4] Building CalCU v%VERSION% with the C# compiler built into Windows...
 "%CSC%" /nologo /target:winexe /out:"%~dp0CalCU.exe" "%SRC%"

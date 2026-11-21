@@ -11,9 +11,13 @@
 // ============================================================================
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -32,7 +36,32 @@ namespace CalCU
         // The one place the version lives. The installer, the website and the
         // GitHub release all read it from this line, so bump it for every
         // release and keep it in this form.
-        public const string Version = "1.2.0";
+        public const string Version = "1.3.0";
+    }
+
+    // Reading and comparing the version the CalCU website publishes. Kept apart
+    // from the window so it can be checked on its own.
+    public static class UpdateCheck
+    {
+        // version.json looks like {"version":"1.3.0"}. Anything else gives null.
+        public static string ReadVersion(string json)
+        {
+            if (json == null) return null;
+            Match match = Regex.Match(json, "\"version\"\\s*:\\s*\"(\\d+(\\.\\d+){1,3})\"");
+            return match.Success ? match.Groups[1].Value : null;
+        }
+
+        public static bool IsNewer(string latest, string current)
+        {
+            try
+            {
+                return new Version(latest) > new Version(current);
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 
     public class OverlayForm : Form
@@ -48,7 +77,19 @@ namespace CalCU
         private static readonly bool HIDE_ON_ESCAPE = true;
         private static readonly string START_POSITION = "TopRight"; // TopRight | BottomRight | Center
         private const string CALCULATOR_URL = "https://tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html";
+        // Once a day CalCU reads the version number from VERSION_URL, and sends
+        // nothing about you. A newer version is shown once, with a tray item
+        // that opens DOWNLOAD_URL. Nothing downloads or installs by itself.
+        private static readonly bool CHECK_FOR_UPDATES = true;
+        private const string VERSION_URL = "https://calcu-youdo.vercel.app/version.json";
+        private const string DOWNLOAD_URL = "https://calcu-youdo.vercel.app";
         // ---------------------------------------------------------------------
+
+        private const int FIRST_CHECK_MS = 30 * 1000;
+        private const int CHECK_EVERY_MS = 24 * 60 * 60 * 1000;
+        // Remembers which version the notification was shown for, so it shows
+        // once per version. The uninstaller removes this key.
+        private const string STATE_KEY = @"Software\CalCU";
 
         // The window is exactly the size of the calculator on the page, so it
         // looks like the exam calculator and nothing else (no extra title bar).
@@ -62,12 +103,15 @@ namespace CalCU
         // The title and the cube-root key use the browser's default text size,
         // which the engine already enlarges for display scaling; pinning them
         // to 16px stops them being scaled twice (once more by the page zoom).
+        // The memory "M" shown after MS or M+ would take a line of its own and
+        // push the keys out of the window, so it is pinned inside the result box.
         private const string PAGE_SCRIPT = @"
 (function () {
     var $ = window.jQuery;
     if (!$ || window.calcuReady) return;
     window.calcuReady = true;
     $('#helptopDiv, #keyPad font').css('font-size', '16px');
+    $('#memory').css({ position: 'absolute', left: '20px', top: '97px', right: 'auto', bottom: 'auto', zIndex: 1 });
     $('.calc_min').die('click');
     $('.calc_max').die('click');
     $('#calc_min, #closeButton').unbind('click').click(function () {
@@ -106,6 +150,9 @@ namespace CalCU
 
         private WebBrowser browser;
         private NotifyIcon trayIcon;
+        private ContextMenu trayMenu;
+        private MenuItem updateItem;
+        private Timer updateTimer;
 
         // CalCU starts hidden (it starts with Windows) and only appears on the
         // shortcut or the tray icon. The installer passes /show so you can see
@@ -161,7 +208,7 @@ namespace CalCU
             browser.Navigate(CALCULATOR_URL);
             this.Controls.Add(browser);
 
-            ContextMenu trayMenu = new ContextMenu();
+            trayMenu = new ContextMenu();
             MenuItem versionItem = trayMenu.MenuItems.Add("CalCU by YouDO v" + Release.Version);
             versionItem.Enabled = false;
             trayMenu.MenuItems.Add("-");
@@ -181,6 +228,97 @@ namespace CalCU
                 Visible = true
             };
             trayIcon.DoubleClick += (s, e) => ToggleOverlay();
+            trayIcon.BalloonTipClicked += (s, e) => OpenDownloadPage();
+
+            if (CHECK_FOR_UPDATES)
+            {
+                updateTimer = new Timer { Interval = FIRST_CHECK_MS };
+                updateTimer.Tick += (s, e) =>
+                {
+                    updateTimer.Interval = CHECK_EVERY_MS;
+                    CheckForUpdate();
+                };
+                updateTimer.Start();
+            }
+        }
+
+        private void CheckForUpdate()
+        {
+            try
+            {
+                // TLS 1.2, which .NET 4 does not turn on by itself.
+                ServicePointManager.SecurityProtocol |= (SecurityProtocolType)3072;
+                WebClient client = new WebClient();
+                client.Encoding = Encoding.UTF8;
+                client.Headers[HttpRequestHeader.UserAgent] = "CalCU/" + Release.Version;
+                client.DownloadStringCompleted += (s, e) =>
+                {
+                    client.Dispose();
+                    if (e.Cancelled || e.Error != null) return;
+                    string latest = UpdateCheck.ReadVersion(e.Result);
+                    if (latest != null && UpdateCheck.IsNewer(latest, Release.Version))
+                    {
+                        ShowUpdate(latest);
+                    }
+                };
+                client.DownloadStringAsync(new Uri(VERSION_URL));
+            }
+            catch { }
+        }
+
+        private void ShowUpdate(string latest)
+        {
+            if (updateItem == null)
+            {
+                updateItem = new MenuItem("", (s, e) => OpenDownloadPage());
+                updateItem.DefaultItem = true; // shown in bold
+                trayMenu.MenuItems.Add(1, updateItem);
+            }
+            updateItem.Text = "Update to " + latest + "…";
+
+            if (ReadNotifiedVersion() == latest) return;
+            trayIcon.ShowBalloonTip(
+                15000,
+                "CalCU " + latest + " is available",
+                "You have " + Release.Version + ". Click here to download it from the CalCU website.",
+                ToolTipIcon.Info);
+            SaveNotifiedVersion(latest);
+        }
+
+        private static string ReadNotifiedVersion()
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(STATE_KEY))
+                {
+                    return key == null ? null : key.GetValue("NotifiedVersion") as string;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static void SaveNotifiedVersion(string version)
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.CreateSubKey(STATE_KEY))
+                {
+                    key.SetValue("NotifiedVersion", version, RegistryValueKind.String);
+                }
+            }
+            catch { }
+        }
+
+        private static void OpenDownloadPage()
+        {
+            try
+            {
+                Process.Start(DOWNLOAD_URL);
+            }
+            catch { }
         }
 
         private void PrepareCalculatorPage()

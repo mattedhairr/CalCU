@@ -16,12 +16,16 @@
 #   calcu --quit     close CalCU
 # ============================================================================
 
+import json
 import os
+import re
 import signal
 import sys
+import threading
+import urllib.request
 
 # Keep in step with the Version line in windows-overlay/CalCU.cs.
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 # ---- Settings ---------------------------------------------------------------
 # The shortcut itself belongs to the desktop (see install-calcu.sh): Wayland does
@@ -32,7 +36,16 @@ ALWAYS_ON_TOP = True
 HIDE_ON_ESCAPE = True
 START_POSITION = "TopRight"  # TopRight | BottomRight | Center
 CALCULATOR_URL = "https://tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html"
+# Once a day CalCU reads the version number from VERSION_URL, and sends nothing
+# about you. A newer version is shown once in a notification whose Download
+# button opens DOWNLOAD_URL. Nothing downloads or installs by itself.
+CHECK_FOR_UPDATES = True
+VERSION_URL = "https://calcu-youdo.vercel.app/version.json"
+DOWNLOAD_URL = "https://calcu-youdo.vercel.app"
 # -----------------------------------------------------------------------------
+
+FIRST_CHECK_SECONDS = 30
+CHECK_EVERY_SECONDS = 24 * 60 * 60
 
 # The window is exactly the size of the calculator on the page, so it looks like
 # the exam calculator and nothing else (no extra title bar).
@@ -46,7 +59,9 @@ COMMANDS = ("--toggle", "--show", "--reload", "--quit")
 # Runs in the calculator page once it has loaded. It removes the page margin and
 # hands the calculator's own controls to this window: dragging the blue bar moves
 # the window, _ and X hide it, and so does Esc. The page's own _ would fold the
-# keys away, and its X does nothing.
+# keys away, and its X does nothing. The memory "M" shown after MS or M+ would
+# take a line of its own and push the keys out of the window, so it is pinned
+# inside the result box.
 PAGE_SCRIPT = r"""
 (function () {
     var $ = window.jQuery;
@@ -57,6 +72,7 @@ PAGE_SCRIPT = r"""
     };
     $('body').css({ margin: 0, overflow: 'hidden' });
     $('#helptopDiv, #keyPad font').css('font-size', '16px');
+    $('#memory').css({ position: 'absolute', left: '20px', top: '97px', right: 'auto', bottom: 'auto', zIndex: 1 });
     $('.calc_min').die('click');
     $('.calc_max').die('click');
     $('#calc_min, #closeButton').unbind('click').click(function () {
@@ -82,6 +98,28 @@ USAGE = """CalCU by YouDO v%s
   calcu --reload   load the calculator page again
   calcu --quit     close CalCU
 """ % VERSION
+
+
+def read_version(text):
+    """version.json looks like {"version": "1.3.0"}. Anything else gives None."""
+    try:
+        version = json.loads(text).get("version")
+    except (ValueError, AttributeError):
+        return None
+    if isinstance(version, str) and re.fullmatch(r"\d+(\.\d+){1,3}", version):
+        return version
+    return None
+
+
+def is_newer(latest, current):
+    def parts(version):
+        numbers = [int(part) for part in version.split(".")]
+        return numbers + [0] * (4 - len(numbers))
+
+    try:
+        return parts(latest) > parts(current)
+    except ValueError:
+        return False
 
 
 def read_command(args):
@@ -142,6 +180,30 @@ def load_tray_library():
     return None
 
 
+# Remembers which version the notification was shown for, so it shows once per
+# version. The uninstaller removes this folder.
+def notified_version_path():
+    return os.path.join(GLib.get_user_config_dir(), "calcu", "notified-version")
+
+
+def read_notified_version():
+    try:
+        with open(notified_version_path(), encoding="utf-8") as state:
+            return state.read().strip()
+    except OSError:
+        return None
+
+
+def save_notified_version(version):
+    path = notified_version_path()
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as state:
+            state.write(version + "\n")
+    except OSError:
+        pass
+
+
 def x11_server_time(gdk_window):
     """A real timestamp lets the window take focus when the shortcut opens it."""
     try:
@@ -164,6 +226,8 @@ class CalcuApp(Gtk.Application):
         self.window = None
         self.view = None
         self.indicator = None
+        self.tray_menu = None
+        self.update_item = None
         self.position = None
         self.load_failed = False
         self.press_time = Gdk.CURRENT_TIME
@@ -174,6 +238,11 @@ class CalcuApp(Gtk.Application):
         self.build_window()
         self.build_tray()
         self.load_calculator()
+        download = Gio.SimpleAction.new("download", None)
+        download.connect("activate", lambda *_: self.open_download_page())
+        self.add_action(download)
+        if CHECK_FOR_UPDATES:
+            GLib.timeout_add_seconds(FIRST_CHECK_SECONDS, self.on_first_update_check)
 
     def do_command_line(self, command_line):
         command = read_command(command_line.get_arguments()[1:])
@@ -249,6 +318,7 @@ class CalcuApp(Gtk.Application):
             item.connect("activate", lambda _item, run=action: run())
             menu.append(item)
         menu.show_all()
+        self.tray_menu = menu
         self.indicator = library.Indicator.new(
             "calcu",
             "accessories-calculator",
@@ -256,6 +326,59 @@ class CalcuApp(Gtk.Application):
         )
         self.indicator.set_status(library.IndicatorStatus.ACTIVE)
         self.indicator.set_menu(menu)
+
+    def on_first_update_check(self):
+        self.check_for_update()
+        GLib.timeout_add_seconds(CHECK_EVERY_SECONDS, self.on_daily_update_check)
+        return False  # run once; the daily check takes over
+
+    def on_daily_update_check(self):
+        self.check_for_update()
+        return True
+
+    def check_for_update(self):
+        # The download runs beside GTK, which is only touched again from idle_add.
+        threading.Thread(target=self.fetch_latest_version, daemon=True).start()
+
+    def fetch_latest_version(self):
+        request = urllib.request.Request(
+            VERSION_URL, headers={"User-Agent": "CalCU/" + VERSION}
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=20) as response:
+                latest = read_version(response.read().decode("utf-8"))
+        except Exception:
+            return
+        if latest and is_newer(latest, VERSION):
+            GLib.idle_add(self.show_update, latest)
+
+    def show_update(self, latest):
+        if self.tray_menu is not None:
+            if self.update_item is None:
+                self.update_item = Gtk.MenuItem()
+                self.update_item.connect("activate", lambda _item: self.open_download_page())
+                self.tray_menu.insert(self.update_item, 1)
+                self.update_item.show()
+            self.update_item.set_label("Update to %s…" % latest)
+
+        if read_notified_version() != latest:
+            notification = Gio.Notification.new("CalCU %s is available" % latest)
+            notification.set_body(
+                "You have %s. Download it from the CalCU website, "
+                "then run the new installer." % VERSION
+            )
+            notification.set_icon(Gio.ThemedIcon.new("accessories-calculator"))
+            notification.add_button("Download", "app.download")
+            notification.set_default_action("app.download")
+            self.send_notification("calcu-update", notification)
+            save_notified_version(latest)
+        return False
+
+    def open_download_page(self):
+        try:
+            Gio.AppInfo.launch_default_for_uri(DOWNLOAD_URL, None)
+        except GLib.Error:
+            pass
 
     def load_calculator(self):
         self.load_failed = False
